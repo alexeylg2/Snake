@@ -1,0 +1,197 @@
+/* Стили для тела страницы */
+body { 
+    margin: 0; 
+    padding: 0; 
+    background: #000; 
+    color: #fff; 
+    font-family: 'Press Start 2P', sans-serif;
+    position: relative;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeSpeed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Центрируем весь контент по вертикали и горизонтали */
+  }
+  
+  /* Обёрточный элемент, чтобы центрировать всё содержимое */
+  #wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Контейнер для канвы игры */
+  #game-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Отступ снизу для кнопки */
+    position: relative;
+    z-index: 1; /* Чтобы канва была на переднем плане */
+  }
+  
+  /* Меню: кнопка "Старт" и таблица рекордов */
+  #menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Расстояние между элементами */
+    margin-top: 40px; /* Уменьшен отступ, чтобы кнопка была ближе */
+    width: 100%; /* Ширина на всю страницу */
+    text-align: center; /* Текст внутри меню по центру */
+  }
+  
+  /* Кнопка меню */
+  .menu-button {
+    background-color: #86BB39; /* Зеленый цвет */
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 18px;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+  }
+  
+  .menu-button:hover {
+    background-color: #75A730; /* Темнее на наведении */
+  }
+  
+  /* Контейнер для счета */
+  .score-container {
+    position: absolute;
+    top: 90%; /* Располагаем счет внизу */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-family: 'Press Start 2P', sans-serif;
+    z-index: 2; /* Чтобы счет был сверху */
+  }
+  
+  /* Окно ввода рекорда */
+  #record-input {
+    background: rgba(50, 50, 50, 0.9);
+    border: 2px solid #66779A;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 9999;
+    max-width: 500px;
+    width: 90%; /* Ограничиваем максимальную ширину */
+    margin: 0 auto; /* Центрируем окно */
+  }
+  
+  /* Заголовок в окне ввода рекорда */
+  #record-input h3 {
+    color: #EC612A;
+    margin-bottom: 10px;
+  }
+  
+  /* Таблица рекордов */
+  #record-table {
+    margin-top: 20px;       
+    display: block;
+    background: rgba(0,0,0,0.6);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 400px;
+  }
+  
+  /* Заголовок таблицы рекордов */
+  #record-table h3 {
+    color: #66779A;
+    margin: 0 0 10px 0;
+  }
+  
+  /* Список рекордов */
+  #record-table ol {
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+    line-height: 1.8; /* Увеличен межстрочный отступ */
+    text-align: left;
+  }
+  
+  #record-table li {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Выравнивание очков по правому краю */
+  #record-table .score-number {
+    float: right;
+    text-align: right;
+    margin-left: 10px; /* Отступ от имени */
+  }
+  
+  /* Поле ввода имени */
+  input.name-input {
+    font-family: 'Press Start 2P', sans-serif;
+    font-size: 16px;
+    width: 100%;
+    max-width: 250px; /* Ограничиваем максимальную ширину */
+    text-align: center;
+    color: #86BB39;
+    background-color: #000;
+    border: 2px solid #EC612A;
+    caret-color: #EC612A;
+    margin-bottom: 10px;
+  }
+  
+  /* Кнопка OK */
+  button.name-submit {
+    font-family: 'Press Start 2P', sans-serif;
+    font-size: 16px;
+    padding: 5px 10px;
+    background-color: #86BB39;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+  }
+  
+  button.name-submit:hover {
+    background-color: #75A730;
+  }
+  
+  /* Канва игры */
+  canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    z-index: 1; /* Убедитесь, что канва не перекрывает другие элементы */
+  }
+  
+  /* Кнопки меню паузы */
+  #pause-menu .menu-button:not(:last-child) {
+    margin-right: 10px; /* Добавляем отступ между кнопками в меню паузы */
+  }
+  
+  /* Меню паузы */
+  #pause-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 9999;
+  }
+  
+  #pause-menu .menu-button {
+    width: 200px; /* Кнопки меню паузы имеют фиксированную ширину */
+    margin-bottom: 10px;
+  }
+  

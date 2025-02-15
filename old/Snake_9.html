@@ -6,8 +6,6 @@
   <title><b>ЗМІЙКОКРАТ</b></title>
   <!-- Подключаем p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
-  <!-- Подключаем p5.sound для звуков -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
   <!-- Подключаем шрифт "Press Start 2P" -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
@@ -22,48 +20,46 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeSpeed;
     }
-<<<<<<<< HEAD:index_14.html
     /* При активном попапе отключаем pointer-events для всех кнопок */
     body.popup-active button {
       pointer-events: none;
     }
-    /* Но внутри pop-up кнопки остаются активными */
+    /* Но внутри pop-up (элементы с id record-input, exit-popup и pause-menu) кнопки остаются активными */
     body.popup-active #record-input button,
     body.popup-active #exit-popup button,
     body.popup-active #pause-menu button {
       pointer-events: auto;
     }
-========
-    /* Обёрточный элемент, чтобы центрировать всё содержимое */
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
     #wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
     /* Уменьшаем отступ игрового поля до 20px */
     #game-container {
       display: flex;
       justify-content: center;
       margin-top: 20px;
-========
+=======
     /* Контейнер для канвы игры */
     #game-container {
       display: flex;
       justify-content: center;
       margin-top: 20px; 
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
     }
-    /* Меню: кнопка "Старт" и таблица рекордов */
     #menu {
       display: flex;
-      flex-direction: column;  
-      align-items: center;     
+      flex-direction: column;
+      align-items: center;
       gap: 20px;               
       margin-top: 30px;        
+      width: 100%;
+      text-align: center;
     }
     .menu-button {
+      font-family: 'Press Start 2P', sans-serif;
       font-size: 18px;
       padding: 10px 20px;
       background-color: #86BB39;
@@ -72,11 +68,12 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
+      margin: 0 auto;
     }
     .menu-button:hover {
       background-color: #75A730;
     }
-    /* Пересчитан верхний отступ счётчика: 20px + 440px + 20px */
+    /* Пересчитан верхний отступ счётчика: 20px (отступ сверху) + 440px (высота канвы) + 20px */
     .score-container {
       position: absolute;
       top: calc(20px + 440px + 20px);
@@ -88,12 +85,12 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
     /* Попапы – непрозрачные */
     #pause-menu, #record-input, #exit-popup {
-========
+=======
     #pause-menu, #record-input {
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
       position: absolute;
       top: 50%;
       left: 50%;
@@ -103,10 +100,10 @@
       border-radius: 8px;
       text-align: center;
       z-index: 9999;
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
       font-family: 'Press Start 2P', sans-serif;
       color: #fff;
-========
+=======
     }
     /* Окно ввода рекорда */
     #record-input {
@@ -114,7 +111,7 @@
       border: 2px solid #66779A;
       padding: 20px;
       border-radius: 8px;
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
     }
     #record-table {
       margin-top: 20px;       
@@ -125,6 +122,7 @@
       font-size: 14px;
       margin-left: auto;
       margin-right: auto;
+      max-width: 400px; /* <-- Добавлено, чтобы таблица не превышала ширину игрового поля */
     }
     #record-table h3 {
       color: #66779A;
@@ -134,14 +132,22 @@
       list-style-position: inside;
       margin: 0;
       padding: 0;
+<<<<<<< HEAD:index_1.html
+      line-height: 1.8;
+=======
       line-height: 1.5;
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
       text-align: left;
     }
     #record-table li {
       margin: 0;
       padding: 0;
     }
-    /* Поле ввода в ретро-стиле */
+    #record-table .score-number {
+      float: right;
+      text-align: right;
+      margin-left: 10px;
+    }
     input.name-input {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -153,7 +159,6 @@
       caret-color: #EC612A;
       margin-bottom: 20px !important;
     }
-    /* Кнопка ОК */
     button.name-submit {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -173,7 +178,7 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
     #pause-menu .menu-button:not(:last-child) {
       margin-right: 10px;
     }
@@ -185,15 +190,13 @@
     #exit-popup .menu-button:hover {
       background-color: #75A730;
     }
-========
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+=======
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
   </style>
 </head>
 <body>
   <div id="wrapper">
-    <!-- Контейнер для канвы игры -->
     <div id="game-container"></div>
-    <!-- Меню: кнопка "Старт" и таблица рекордов -->
     <div id="menu"></div>
   </div>
   <script>
@@ -231,20 +234,12 @@
     let records = [];
     let lastUpdatedUser = null;
 
-    // Тач-события
-    let touchStartX = 0;
-    let touchStartY = 0;
-
     // Авто-демо
     let autoStartTimeout = null;
 
     // Окно ввода рекорда
     let inputDisplayed = false;
     let scoreSubmitted = false;
-
-<<<<<<<< HEAD:index_14.html
-    // Звуковой генератор (осциллятор)
-    let osc; 
 
     // Функции для управления состоянием pop-up
     function activatePopup() {
@@ -254,21 +249,18 @@
       document.body.classList.remove("popup-active");
     }
 
-========
-    // =============== Работа с рекордами ===============
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
     function loadRecords() {
       try {
         let stored = localStorage.getItem("snakeRecords");
         if (stored) {
           records = JSON.parse(stored);
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
           if (records.length > 10) {
             records = records.slice(0, 10);
             localStorage.setItem("snakeRecords", JSON.stringify(records));
           }
-========
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+=======
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
         } else {
           records = [];
         }
@@ -311,15 +303,11 @@
       }
       let html = "<h3>Топ гравців</h3><ol>";
       records.forEach(r => {
-<<<<<<<< HEAD:index_14.html
         let nameHtml = r.name;
         if (r.name === lastUpdatedUser) {
           nameHtml = `<span style="color: #EC612A;">${r.name}</span>`;
         }
         html += `<li>${nameHtml}: <span class="score-number">${r.score}</span></li>`;
-========
-        html += `<li>${r.name}: ${r.score}</li>`;
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       });
       html += "</ol>";
       recordDiv.html(html);
@@ -337,19 +325,6 @@
       updateRecordsTable();
     }
 
-<<<<<<<< HEAD:index_14.html
-    function playBeep(freq, duration) {
-      // Устанавливаем частоту и длительность звука
-      osc.freq(freq);
-      osc.amp(0.5, 0.05);
-      setTimeout(() => {
-        osc.amp(0, 0.05);
-      }, duration);
-    }
-
-========
-    // Окно ввода имени
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
     function showNameInput() {
       activatePopup();
       let inputDiv = createDiv("");
@@ -421,15 +396,6 @@
       canvas.parent('game-container');
       frameRate(10);
 
-<<<<<<<< HEAD:index_14.html
-      // Инициализируем осциллятор для звуков
-      osc = new p5.Oscillator('square');
-      osc.amp(0);
-      osc.start();
-
-========
-      // Верхний блок счёта (виден только во время игры)
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       scoreDiv = createDiv("Рахунок: 0");
       scoreDiv.class("score-container");
       scoreDiv.parent(document.body);
@@ -438,7 +404,6 @@
       showStartMenu();
       resetGame();
 
-<<<<<<<< HEAD:index_14.html
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
           e.stopPropagation();
@@ -449,11 +414,6 @@
       document.addEventListener('keydown', (e) => {
         if (!gameStarted && (e.key === 'Enter' || e.key === 'Return' || e.code === 'NumpadEnter')) {
           e.preventDefault();
-========
-      // Нажатие Enter при не запущенной игре => клик "Старт"
-      document.addEventListener('keydown', (e) => {
-        if (!gameStarted && e.key === 'Enter') {
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
           if (userButton) {
             userButton.elt.click();
           }
@@ -468,7 +428,7 @@
             resetGame();
             return;
           }
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
           if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
             if (!inputDisplayed) {
               showNameInput();
@@ -476,14 +436,7 @@
             return;
           }
           showGameOverScreen();
-          return;
-        } else {
-          background("#f0f0f0");
-          noStroke();
-          fill("#1c1c1c");
-          rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
-          
-========
+=======
           // Отрисовка фона Game Over
           background("#1c1c1c");
           noStroke();
@@ -497,17 +450,18 @@
           textStyle(BOLD);
           text("GAME OVER", width / 2, height / 2 - 60);
 
-          // Убрали вывод счёта в центре экрана, чтобы не дублировать
-
           // "Press any key"
           textSize(24);
           fill(200);
           text("Press any key", width / 2, height / 2 + 40);
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
           return;
         } else {
-          // Заставка
-          background("#1c1c1c");
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+          background("#f0f0f0");
+          noStroke();
+          fill("#1c1c1c");
+          rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
+          
           let s = 10;
           let artW = 8 * s;
           let artH = 8 * s;
@@ -523,21 +477,21 @@
           fill("#86BB39");
           textSize(48);
           textAlign(CENTER, CENTER);
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
           textStyle(BOLD);
           text("ЗМІЙКОКРАТ", width / 2, height / 2 + 10);
-========
+=======
           text("Змійкократ", width / 2, height / 2 + 10);
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
           
           let alphaMenu = map(sin(frameCount * 0.2), -1, 1, 100, 255);
           fill(134, 187, 57, alphaMenu);
           textSize(24);
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
           text("Натисніть Старт", width / 2, height / 2 + 50);
-========
+=======
           text("Виберіть режим керування", width / 2, height / 2 + 50);
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
           return;
         }
       }
@@ -573,11 +527,6 @@
       drawGrid();
 
       if (paused) return;
-<<<<<<<< HEAD:index_14.html
-========
-
-      // Демо-режим (ai)
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       if (controlMode === "ai") {
         direction = chooseDirection();
       }
@@ -588,25 +537,16 @@
       let newHead = { x: newX, y: newY };
 
       if (collision(newHead)) {
-<<<<<<<< HEAD:index_14.html
         if (!collisionDetected) {
           collisionDetected = true;
           collisionStartTime = millis();
-          // Проигрываем звук столкновения (например, низкий тон)
-          playBeep(150, 200);
         }
-========
-        gameOver = true;
-        gameStarted = false;
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       } else {
         snake.push(newHead);
         if (newHead.x === bonus.x && newHead.y === bonus.y) {
           if (controlMode === "user") {
             score++;
             updateScore();
-            // Проигрываем звук поедания бонуса (например, высокий тон)
-            playBeep(600, 100);
           }
           spawnBonus();
         } else {
@@ -622,7 +562,6 @@
       }
     }
 
-<<<<<<<< HEAD:index_14.html
     function handleGlobalEsc() {
       if (inputDisplayed) {
         let inputDiv = select('#record-input');
@@ -631,63 +570,8 @@
         scoreSubmitted = true;
         deactivatePopup();
         return;
-========
-    // =============== Логика управления ===============
-    function showStartMenu() {
-      let menuDiv = select('#menu');
-      menuDiv.html("");
-      menuDiv.show();
-
-      // При отображении меню всегда скрываем верхний счётчик
-      scoreDiv.hide();
-
-      if (autoStartTimeout) clearTimeout(autoStartTimeout);
-
-      userButton = createButton('Старт');
-      userButton.class("menu-button");
-      userButton.parent(menuDiv);
-      userButton.mousePressed(() => {
-        if (autoStartTimeout) clearTimeout(autoStartTimeout);
-        controlMode = "user";
-        gameStarted = true;
-        gameOver = false;
-        scoreSubmitted = false;
-        inputDisplayed = false;
-        menuDiv.hide();
-        resetGame();
-      });
-
-      updateRecordsTable();
-
-      autoStartTimeout = setTimeout(() => {
-        if (!gameStarted) {
-          controlMode = "ai";
-          gameStarted = true;
-          scoreSubmitted = false;
-          inputDisplayed = false;
-          resetGame();
-        }
-      }, 5000);
-    }
-
-    function resetGame() {
-      snake = [];
-      snake.push({ x: floor(cols / 2), y: floor(rows / 2) });
-      direction = { dx: 1, dy: 0 };
-      score = 0;
-      paused = false;
-      gameOver = false;
-      spawnBonus();
-      inputDisplayed = false;
-
-      // Показываем верхний счётчик только в режиме user
-      if (gameStarted && controlMode === "user") {
-        scoreDiv.show();
-        updateScore();
-      } else {
-        scoreDiv.hide();
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       }
+<<<<<<< HEAD:index_1.html
       
       let exitPopup = select('#exit-popup');
       if (exitPopup) {
@@ -705,6 +589,13 @@
           } else {
             pauseGame();
           }
+=======
+      if (keyCode === ESCAPE) {
+        if (!paused) {
+          pauseGame();
+        } else {
+          resumeGame();
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
         }
         return;
       }
@@ -713,30 +604,16 @@
     }
 
     function keyPressed() {
-<<<<<<<< HEAD:index_14.html
       if (inputDisplayed) return;
       
-========
-      // Если игра окончена — любое нажатие клавиши => showStartMenu()
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       if (gameOver) {
         if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
           return;
         }
+        gameOver = false;
         showStartMenu();
         return;
       }
-<<<<<<<< HEAD:index_14.html
-========
-      if (keyCode === ESCAPE) {
-        if (!paused) {
-          pauseGame();
-        } else {
-          resumeGame();
-        }
-        return;
-      }
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       if (paused) return;
       if (controlMode === "user") {
         if (keyCode === UP_ARROW && direction.dy !== 1) {
@@ -751,7 +628,7 @@
       }
     }
 
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
     function showExitPopup() {
       activatePopup();
       let exitPopupDiv = createDiv('');
@@ -780,8 +657,8 @@
       });
     }
 
-========
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+=======
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
     function pauseGame() {
       paused = true;
       createPauseMenu();
@@ -796,9 +673,9 @@
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
-<<<<<<<< HEAD:index_14.html
+<<<<<<< HEAD:index_1.html
       let exitBtn = createButton('Головне меню');
-========
+=======
 
       let resumeBtn = createButton('Продовжити');
       resumeBtn.class("menu-button");
@@ -808,7 +685,7 @@
       });
 
       let exitBtn = createButton('Вихід у головне меню');
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_9.html
       exitBtn.class("menu-button");
       exitBtn.parent(pauseMenuDiv);
       exitBtn.mousePressed(() => {
@@ -827,10 +704,6 @@
       }
     }
 
-<<<<<<<< HEAD:index_14.html
-========
-    // =============== Вспомогательные функции ===============
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
     function spawnBonus() {
       let valid = false;
       let x, y;
@@ -882,17 +755,13 @@
         { dx: 0, dy: 1 },
         { dx: 0, dy: -1 }
       ];
-<<<<<<<< HEAD:index_14.html
-========
-      // Жадная сортировка по расстоянию
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
       moves.sort((a, b) => {
         let newAX = (head.x + a.dx + cols) % cols;
         let newAY = (head.y + a.dy + rows) % rows;
         let newBX = (head.x + b.dx + cols) % cols;
         let newBY = (head.y + b.dy + rows) % rows;
-        let dA = abs(newAX - bonus.x) + abs(newAY - bonus.y);
-        let dB = abs(newBX - bonus.x) + abs(newBY - bonus.y);
+        let dA = Math.abs(newAX - bonus.x) + Math.abs(newAY - bonus.y);
+        let dB = Math.abs(newBX - bonus.x) + Math.abs(newBY - bonus.y);
         return dA - dB;
       });
       for (let move of moves) {
@@ -941,7 +810,6 @@
         }
       }
     }
-<<<<<<<< HEAD:index_14.html
 
     function showStartMenu() {
       let menuDiv = select('#menu');
@@ -992,8 +860,6 @@
         scoreDiv.hide();
       }
     }
-========
->>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:old/Snake_8.html
   </script>
 </body>
 </html>

@@ -20,26 +20,19 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeSpeed;
     }
-    /* При активном попапе отключаем pointer-events для всех кнопок */
-    body.popup-active button {
-      pointer-events: none;
-    }
-    /* Но внутри pop-up (элементы с id record-input, exit-popup и pause-menu) кнопки остаются активными */
-    body.popup-active #record-input button,
-    body.popup-active #exit-popup button,
-    body.popup-active #pause-menu button {
-      pointer-events: auto;
-    }
     #wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    /* Уменьшаем отступ игрового поля до 20px */
     #game-container {
       display: flex;
       justify-content: center;
-      margin-top: 20px;
+<<<<<<< HEAD:index.html
+      margin-top: 100px;
+=======
+      margin-top: 40px; /* <-- было 20px, теперь 40px */
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
     }
     #menu {
       display: flex;
@@ -60,15 +53,18 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
-      margin: 0 auto;
+      margin: 0 auto; /* Сбрасывает верхний/нижний отступ */
     }
     .menu-button:hover {
       background-color: #75A730;
     }
-    /* Пересчитан верхний отступ счётчика: 20px (отступ сверху) + 440px (высота канвы) + 20px */
     .score-container {
       position: absolute;
-      top: calc(20px + 440px + 20px);
+<<<<<<< HEAD:index.html
+      top: calc(20px + 440px + 100px);
+=======
+      top: calc(20px + 440px + 40px); /* <-- увеличен отступ сверху на 20px */
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
@@ -77,13 +73,13 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
-    /* Попапы – непрозрачные */
+    /* Сделаны все pop-up не прозрачными */
     #pause-menu, #record-input, #exit-popup {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgb(0, 0, 0);
+      background: rgb(0, 0, 0); /* непрозрачный черный фон */
       padding: 20px;
       border-radius: 8px;
       text-align: center;
@@ -91,6 +87,7 @@
       font-family: 'Press Start 2P', sans-serif;
       color: #fff;
     }
+    /* Если необходимо, можно также сделать фон таблицы рекордов непрозрачным */
     #record-table {
       margin-top: 20px;       
       display: block;
@@ -122,6 +119,8 @@
       text-align: right;
       margin-left: 10px;
     }
+    /* !!! ВАЖНО: Увеличиваем нижний отступ у поля ввода,
+       чтобы гарантировать зазор перед кнопкой OK */
     input.name-input {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -133,6 +132,7 @@
       caret-color: #EC612A;
       margin-bottom: 20px !important;
     }
+    /* Кнопка OK — убираем margin-top, чтобы не мешать полю ввода */
     button.name-submit {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -155,14 +155,22 @@
     #pause-menu .menu-button:not(:last-child) {
       margin-right: 10px;
     }
+<<<<<<< HEAD:index.html
     #exit-popup .menu-button {
       margin: 10px;
       width: 100px;
       height: 50px;
     }
+    /*
+    #exit-popup .menu-button + .menu-button {
+      margin-top: 20px;
+    }
+    */
     #exit-popup .menu-button:hover {
       background-color: #75A730;
     }
+=======
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
   </style>
 </head>
 <body>
@@ -203,7 +211,7 @@
 
     // Рекорды
     let records = [];
-    let lastUpdatedUser = null;
+    let lastUpdatedUser = null; // Подсвечиваем последнее обновленное имя
 
     // Авто-демо
     let autoStartTimeout = null;
@@ -212,23 +220,19 @@
     let inputDisplayed = false;
     let scoreSubmitted = false;
 
-    // Функции для управления состоянием pop-up
-    function activatePopup() {
-      document.body.classList.add("popup-active");
-    }
-    function deactivatePopup() {
-      document.body.classList.remove("popup-active");
-    }
-
+    // =============== Работа с рекордами ===============
     function loadRecords() {
       try {
         let stored = localStorage.getItem("snakeRecords");
         if (stored) {
           records = JSON.parse(stored);
+<<<<<<< HEAD:index.html
           if (records.length > 10) {
             records = records.slice(0, 10);
             localStorage.setItem("snakeRecords", JSON.stringify(records));
           }
+=======
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
         } else {
           records = [];
         }
@@ -237,6 +241,7 @@
         records = [];
       }
 
+      // Если таблица рекордов пустая, заполняем ее украинскими именами и показателями рекордов от 1 до 10
       if (records.length === 0) {
         const defaultRecords = [
           { name: "Олександр", score: 10 },
@@ -280,21 +285,29 @@
       html += "</ol>";
       recordDiv.html(html);
     }
+<<<<<<< HEAD:index.html
+=======
+    // Увеличили лимит рекордов с 10 до 15
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
     function qualifies(score) {
-      if (records.length < 10) return true;
+      if (records.length < 15) return true;
       return score > records[records.length - 1].score;
     }
     function addRecord(name, score) {
       lastUpdatedUser = name;
       records.push({ name, score });
       records.sort((a, b) => b.score - a.score);
+<<<<<<< HEAD:index.html
       if (records.length > 10) records.pop();
+=======
+      // Если записей больше 15, удаляем лишние
+      if (records.length > 15) records.pop();
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
       saveRecords();
       updateRecordsTable();
     }
 
     function showNameInput() {
-      activatePopup();
       let inputDiv = createDiv("");
       inputDiv.id("record-input");
       inputDiv.parent(document.body);
@@ -323,7 +336,6 @@
         scoreSubmitted = true;
         inputDisplayed = false;
         inputDiv.remove();
-        deactivatePopup();
       });
 
       nameInput.elt.addEventListener('keydown', function(evt) {
@@ -336,11 +348,11 @@
           scoreSubmitted = true;
           inputDisplayed = false;
           inputDiv.remove();
-          deactivatePopup();
         }
       });
     }
 
+    // Функция для отрисовки экрана Game Over с таблицей рекордов
     function showGameOverScreen() {
       background("#1c1c1c");
       noStroke();
@@ -372,6 +384,7 @@
       showStartMenu();
       resetGame();
 
+      // Глобальный обработчик ESC – единый для всех состояний
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
           e.stopPropagation();
@@ -379,6 +392,7 @@
         }
       });
 
+      // Если игра не запущена, нажатие Enter запускает игру (учитываем Return и NumpadEnter)
       document.addEventListener('keydown', (e) => {
         if (!gameStarted && (e.key === 'Enter' || e.key === 'Return' || e.code === 'NumpadEnter')) {
           e.preventDefault();
@@ -502,23 +516,26 @@
       }
     }
 
+    // Единый обработчик ESC
     function handleGlobalEsc() {
+      // Если открыт pop-up ввода имени, закрываем его
       if (inputDisplayed) {
         let inputDiv = select('#record-input');
         if (inputDiv) inputDiv.remove();
         inputDisplayed = false;
         scoreSubmitted = true;
-        deactivatePopup();
         return;
       }
+<<<<<<< HEAD:index.html
       
+      // Если открыт exit popup, закрываем его
       let exitPopup = select('#exit-popup');
       if (exitPopup) {
         exitPopup.remove();
-        deactivatePopup();
         return;
       }
       
+      // Если игра запущена
       if (gameStarted) {
         if (paused) {
           resumeGame();
@@ -528,14 +545,23 @@
           } else {
             pauseGame();
           }
+=======
+      if (keyCode === ESCAPE) {
+        if (!paused) {
+          pauseGame();
+        } else {
+          resumeGame();
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
         }
         return;
       }
       
+      // Если игра не запущена
       showExitPopup();
     }
 
     function keyPressed() {
+      // Обработка остальных клавиш (стрелок)
       if (inputDisplayed) return;
       
       if (gameOver) {
@@ -560,8 +586,9 @@
       }
     }
 
+<<<<<<< HEAD:index.html
+    // Функция для показа окна выхода
     function showExitPopup() {
-      activatePopup();
       let exitPopupDiv = createDiv('');
       exitPopupDiv.id('exit-popup');
       exitPopupDiv.parent(document.body);
@@ -577,17 +604,23 @@
       yesBtn.class("menu-button");
       yesBtn.parent(buttonContainer);
       yesBtn.mousePressed(() => {
-        window.close();
+        // Используем API из preload.js для выхода из приложения
+        if (window.electronAPI && window.electronAPI.quitApp) {
+          window.electronAPI.quitApp();
+        } else {
+          console.log("Electron API не доступно");
+        }
       });
       let noBtn = createButton('Ніт');
       noBtn.class("menu-button");
       noBtn.parent(buttonContainer);
       noBtn.mousePressed(() => {
         exitPopupDiv.remove();
-        deactivatePopup();
       });
     }
 
+=======
+>>>>>>> 4197aa4180e3ca7420bf0596e2e6a3c079498be6:Snake_10.html
     function pauseGame() {
       paused = true;
       createPauseMenu();
@@ -595,10 +628,8 @@
     function resumeGame() {
       paused = false;
       removePauseMenu();
-      deactivatePopup();
     }
     function createPauseMenu() {
-      activatePopup();
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
@@ -611,7 +642,6 @@
         removePauseMenu();
         resetGame();
         showStartMenu();
-        deactivatePopup();
       });
     }
     function removePauseMenu() {
@@ -660,7 +690,7 @@
         bodyToCheck.shift();
       }
       for (let segment of bodyToCheck) {
-        if (segment.x === newHead.x && newHead.y === segment.y) return true;
+        if (segment.x === newHead.x && segment.y === newHead.y) return true;
       }
       return false;
     }

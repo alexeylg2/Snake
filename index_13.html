@@ -20,16 +20,6 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeSpeed;
     }
-    /* При активном попапе отключаем pointer-events для всех кнопок */
-    body.popup-active button {
-      pointer-events: none;
-    }
-    /* Но внутри pop-up (элементы с id record-input, exit-popup и pause-menu) кнопки остаются активными */
-    body.popup-active #record-input button,
-    body.popup-active #exit-popup button,
-    body.popup-active #pause-menu button {
-      pointer-events: auto;
-    }
     #wrapper {
       display: flex;
       flex-direction: column;
@@ -77,7 +67,7 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
-    /* Попапы – непрозрачные */
+    /* Сделаны все pop-up не прозрачными */
     #pause-menu, #record-input, #exit-popup {
       position: absolute;
       top: 50%;
@@ -212,14 +202,6 @@
     let inputDisplayed = false;
     let scoreSubmitted = false;
 
-    // Функции для управления состоянием pop-up
-    function activatePopup() {
-      document.body.classList.add("popup-active");
-    }
-    function deactivatePopup() {
-      document.body.classList.remove("popup-active");
-    }
-
     function loadRecords() {
       try {
         let stored = localStorage.getItem("snakeRecords");
@@ -294,7 +276,6 @@
     }
 
     function showNameInput() {
-      activatePopup();
       let inputDiv = createDiv("");
       inputDiv.id("record-input");
       inputDiv.parent(document.body);
@@ -323,7 +304,6 @@
         scoreSubmitted = true;
         inputDisplayed = false;
         inputDiv.remove();
-        deactivatePopup();
       });
 
       nameInput.elt.addEventListener('keydown', function(evt) {
@@ -336,7 +316,6 @@
           scoreSubmitted = true;
           inputDisplayed = false;
           inputDiv.remove();
-          deactivatePopup();
         }
       });
     }
@@ -508,14 +487,12 @@
         if (inputDiv) inputDiv.remove();
         inputDisplayed = false;
         scoreSubmitted = true;
-        deactivatePopup();
         return;
       }
       
       let exitPopup = select('#exit-popup');
       if (exitPopup) {
         exitPopup.remove();
-        deactivatePopup();
         return;
       }
       
@@ -561,7 +538,6 @@
     }
 
     function showExitPopup() {
-      activatePopup();
       let exitPopupDiv = createDiv('');
       exitPopupDiv.id('exit-popup');
       exitPopupDiv.parent(document.body);
@@ -584,7 +560,6 @@
       noBtn.parent(buttonContainer);
       noBtn.mousePressed(() => {
         exitPopupDiv.remove();
-        deactivatePopup();
       });
     }
 
@@ -595,10 +570,8 @@
     function resumeGame() {
       paused = false;
       removePauseMenu();
-      deactivatePopup();
     }
     function createPauseMenu() {
-      activatePopup();
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
@@ -611,7 +584,6 @@
         removePauseMenu();
         resetGame();
         showStartMenu();
-        deactivatePopup();
       });
     }
     function removePauseMenu() {

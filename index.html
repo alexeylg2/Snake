@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ЗМІЙКОКРАТ</title>
+  <title><b>ЗМІЙКОКРАТ</b></title>
   <!-- Подключаем p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
   <!-- Подключаем шрифт "Press Start 2P" -->
@@ -20,29 +20,27 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeSpeed;
     }
-    /* Обёрточный элемент, чтобы центрировать всё содержимое */
     #wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    /* Контейнер для канвы игры (увеличили отступ сверху) */
     #game-container {
       display: flex;
       justify-content: center;
-      margin-top: 100px; /* <-- было 20px, теперь 40px */
+      margin-top: 100px;
     }
-    /* Меню: кнопка "Старт" и таблица рекордов */
     #menu {
       display: flex;
       flex-direction: column;
-      align-items: center; /* Центрируем все элементы меню */
+      align-items: center;
       gap: 20px;               
       margin-top: 30px;        
-      width: 100%;             /* Ширина на всю страницу */
-      text-align: center;      /* Текст внутри меню по центру */
+      width: 100%;
+      text-align: center;
     }
     .menu-button {
+      font-family: 'Press Start 2P', sans-serif;
       font-size: 18px;
       padding: 10px 20px;
       background-color: #86BB39;
@@ -51,14 +49,14 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
-      margin: 0 auto; /* Кнопка строго по центру */
+      margin: 0 auto; /* Сбрасывает верхний/нижний отступ */
     }
     .menu-button:hover {
       background-color: #75A730;
     }
     .score-container {
       position: absolute;
-      top: calc(20px + 440px + 100px); /* <-- увеличен отступ сверху на 20px */
+      top: calc(20px + 440px + 100px);
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
@@ -67,28 +65,25 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
-    #pause-menu, #record-input {
+    /* Сделаны все pop-up не прозрачными */
+    #pause-menu, #record-input, #exit-popup {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.85);
+      background: rgb(0, 0, 0); /* непрозрачный черный фон */
       padding: 20px;
       border-radius: 8px;
       text-align: center;
       z-index: 9999;
+      font-family: 'Press Start 2P', sans-serif;
+      color: #fff;
     }
-    /* Окно ввода рекорда */
-    #record-input {
-      background: rgba(50, 50, 50, 0.9);
-      border: 2px solid #66779A;
-      padding: 20px;
-      border-radius: 8px;
-    }
+    /* Если необходимо, можно также сделать фон таблицы рекордов непрозрачным */
     #record-table {
       margin-top: 20px;       
       display: block;
-      background: rgba(0,0,0,0.6);
+      background: rgb(0, 0, 0);
       padding: 10px;
       border-radius: 8px;
       font-size: 14px;
@@ -104,21 +99,20 @@
       list-style-position: inside;
       margin: 0;
       padding: 0;
-      /* Увеличиваем межстрочный отступ */
-      line-height: 1.8; /* <-- изменено с 1.5 на 1.8 */
+      line-height: 1.8;
       text-align: left;
     }
     #record-table li {
       margin: 0;
       padding: 0;
     }
-    /* Выравниваем очки (числа) по правому краю */
     #record-table .score-number {
       float: right;
       text-align: right;
-      margin-left: 10px; /* Чтобы не прилипало к имени */
+      margin-left: 10px;
     }
-    /* Поле ввода в ретро-стиле */
+    /* !!! ВАЖНО: Увеличиваем нижний отступ у поля ввода,
+       чтобы гарантировать зазор перед кнопкой OK */
     input.name-input {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -128,9 +122,9 @@
       background-color: #000;
       border: 2px solid #EC612A;
       caret-color: #EC612A;
-      margin-bottom: 10px;
+      margin-bottom: 20px !important;
     }
-    /* Кнопка ОК */
+    /* Кнопка OK — убираем margin-top, чтобы не мешать полю ввода */
     button.name-submit {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -141,7 +135,7 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
-      margin-top: 10px;
+      margin: 0 auto;
     }
     button.name-submit:hover {
       background-color: #75A730;
@@ -150,28 +144,27 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
-    /* ---- Добавлен отступ между кнопками в меню паузы ---- */
     #pause-menu .menu-button:not(:last-child) {
       margin-right: 10px;
     }
-    #exit-popup {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.85);
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      z-index: 9999;
+    #exit-popup .menu-button {
+      margin: 10px;
+      width: 100px;
+      height: 50px;
+    }
+    /*
+    #exit-popup .menu-button + .menu-button {
+      margin-top: 20px;
+    }
+    */
+    #exit-popup .menu-button:hover {
+      background-color: #75A730;
     }
   </style>
 </head>
 <body>
   <div id="wrapper">
-    <!-- Контейнер для канвы игры -->
     <div id="game-container"></div>
-    <!-- Меню: кнопка "Старт" и таблица рекордов -->
     <div id="menu"></div>
   </div>
   <script>
@@ -194,6 +187,12 @@
     let gameOver = false;
     let canvas;
 
+    // Переменные для режима столкновения и мигания
+    let collisionDetected = false;
+    let collisionStartTime = 0;
+    let blinkInterval = 300;
+    let blinkVisible = true;
+
     // Интерфейс
     let userButton;
     let scoreDiv;
@@ -201,6 +200,7 @@
 
     // Рекорды
     let records = [];
+    let lastUpdatedUser = null; // Подсвечиваем последнее обновленное имя
 
     // Авто-демо
     let autoStartTimeout = null;
@@ -215,9 +215,9 @@
         let stored = localStorage.getItem("snakeRecords");
         if (stored) {
           records = JSON.parse(stored);
-          // Ограничиваем количество рекордов до 10
           if (records.length > 10) {
             records = records.slice(0, 10);
+            localStorage.setItem("snakeRecords", JSON.stringify(records));
           }
         } else {
           records = [];
@@ -225,6 +225,24 @@
       } catch(e) {
         console.error("Ошибка доступа к localStorage:", e);
         records = [];
+      }
+
+      // Если таблица рекордов пустая, заполняем ее украинскими именами и показателями рекордов от 1 до 10
+      if (records.length === 0) {
+        const defaultRecords = [
+          { name: "Олександр", score: 10 },
+          { name: "Андрій", score: 9 },
+          { name: "Іван", score: 8 },
+          { name: "Микола", score: 7 },
+          { name: "Сергій", score: 6 },
+          { name: "Володимир", score: 5 },
+          { name: "Юрій", score: 4 },
+          { name: "Петро", score: 3 },
+          { name: "Дмитро", score: 2 },
+          { name: "Богдан", score: 1 }
+        ];
+        records = defaultRecords;
+        saveRecords();
       }
     }
     function saveRecords() {
@@ -244,26 +262,28 @@
       }
       let html = "<h3>Топ гравців</h3><ol>";
       records.forEach(r => {
-        html += `<li>${r.name}: <span class="score-number">${r.score}</span></li>`;
+        let nameHtml = r.name;
+        if (r.name === lastUpdatedUser) {
+          nameHtml = `<span style="color: #EC612A;">${r.name}</span>`;
+        }
+        html += `<li>${nameHtml}: <span class="score-number">${r.score}</span></li>`;
       });
       html += "</ol>";
       recordDiv.html(html);
     }
-    // Увеличили лимит рекордов до 10
     function qualifies(score) {
       if (records.length < 10) return true;
       return score > records[records.length - 1].score;
     }
     function addRecord(name, score) {
+      lastUpdatedUser = name;
       records.push({ name, score });
       records.sort((a, b) => b.score - a.score);
-      // Если записей больше 10, удаляем лишние
       if (records.length > 10) records.pop();
       saveRecords();
       updateRecordsTable();
     }
 
-    // Окно ввода имени
     function showNameInput() {
       let inputDiv = createDiv("");
       inputDiv.id("record-input");
@@ -274,7 +294,7 @@
       title.style("color", "#EC612A");
       title.parent(inputDiv);
       
-      let info = createP("Введіть своє ім'я (до 12 знаків):");
+      let info = createP("Введіть своє ім'я:");
       info.parent(inputDiv);
       
       let nameInput = createInput("");
@@ -286,41 +306,46 @@
       let submitBtn = createButton("OK");
       submitBtn.class("name-submit");
       submitBtn.parent(inputDiv);
-      submitBtn.mousePressed(submitRecord);
+      submitBtn.mousePressed(() => {
+        let name = nameInput.value().trim();
+        if (name === "") name = "ANON";
+        addRecord(name, score);
+        scoreSubmitted = true;
+        inputDisplayed = false;
+        inputDiv.remove();
+      });
 
       nameInput.elt.addEventListener('keydown', function(evt) {
         evt.stopPropagation();
         if (evt.key === 'Enter') {
           evt.preventDefault();
-          submitRecord();
+          let name = nameInput.value().trim();
+          if (name === "") name = "ANON";
+          addRecord(name, score);
+          scoreSubmitted = true;
+          inputDisplayed = false;
+          inputDiv.remove();
         }
       });
-      function escHandler(e) {
-        if (e.key === 'Escape') {
-          e.stopPropagation();
-          removeEscHandler();
-          inputDiv.remove();
-          scoreSubmitted = true;
-        }
-      }
-      function removeEscHandler() {
-        nameInput.elt.removeEventListener('keydown', escHandler);
-        document.removeEventListener('keydown', escHandler);
-      }
-      inputDiv.elt.addEventListener('keydown', escHandler);
-      document.addEventListener('keydown', escHandler);
-
-      function submitRecord() {
-        let name = nameInput.value().trim();
-        if (name === "") name = "ANON";
-        addRecord(name, score);
-        scoreSubmitted = true;
-        removeEscHandler();
-        inputDiv.remove();
-      }
     }
 
-    // =============== p5: setup, draw ===============
+    // Функция для отрисовки экрана Game Over с таблицей рекордов
+    function showGameOverScreen() {
+      background("#1c1c1c");
+      noStroke();
+      fill(0, 150);
+      rect(0, 0, width, height);
+      fill("#FF4136");
+      textAlign(CENTER, CENTER);
+      textSize(60);
+      textStyle(BOLD);
+      text("GAME OVER", width / 2, height / 2 - 60);
+      textSize(24);
+      fill(200);
+      text("Змійка загубилась!", width / 2, height / 2 + 40);
+      updateRecordsTable();
+    }
+
     function setup() {
       pixelDensity(1);
       canvas = createCanvas(canvasWidth, canvasHeight);
@@ -328,7 +353,6 @@
       canvas.parent('game-container');
       frameRate(10);
 
-      // Верхний блок счёта (виден только во время игры)
       scoreDiv = createDiv("Рахунок: 0");
       scoreDiv.class("score-container");
       scoreDiv.parent(document.body);
@@ -337,9 +361,18 @@
       showStartMenu();
       resetGame();
 
-      // Нажатие Enter при не запущенной игре => клик "Старт"
+      // Глобальный обработчик ESC – единый для всех состояний
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          e.stopPropagation();
+          handleGlobalEsc();
+        }
+      });
+
+      // Если игра не запущена, нажатие Enter запускает игру (учитываем Return и NumpadEnter)
       document.addEventListener('keydown', (e) => {
-        if (!gameStarted && e.key === 'Enter') {
+        if (!gameStarted && (e.key === 'Enter' || e.key === 'Return' || e.code === 'NumpadEnter')) {
+          e.preventDefault();
           if (userButton) {
             userButton.elt.click();
           }
@@ -348,36 +381,26 @@
     }
 
     function draw() {
-      // Если игра не запущена
       if (!gameStarted) {
-        // Если gameOver, показываем экран "GAME OVER"
         if (gameOver) {
-          // Если игрок набрал рекорд, имя не введено, и окно ввода не показывали
-          if (controlMode === "user" && qualifies(score) && !scoreSubmitted && !inputDisplayed) {
-            showNameInput();
+          if (controlMode === "ai") {
+            resetGame();
             return;
           }
-          // Отрисовка фона Game Over
-          background("#1c1c1c");
-          noStroke();
-          fill(0, 150);
-          rect(0, 0, width, height);
-
-          // Текст "GAME OVER"
-          fill("#FF4136");
-          textAlign(CENTER, CENTER);
-          textSize(60);
-          textStyle(BOLD);
-          text("GAME OVER", width / 2, height / 2 - 60);
-
-          // "Спробуємо ще?"
-          textSize(24);
-          fill(200);
-          text("Спробуємо ще?", width / 2, height / 2 + 40);
+          if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
+            if (!inputDisplayed) {
+              showNameInput();
+            }
+            return;
+          }
+          showGameOverScreen();
           return;
         } else {
-          // Заставка
-          background("#1c1c1c");
+          background("#f0f0f0");
+          noStroke();
+          fill("#1c1c1c");
+          rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
+          
           let s = 10;
           let artW = 8 * s;
           let artH = 8 * s;
@@ -386,23 +409,48 @@
           push();
             textSize(48);
             textAlign(CENTER, CENTER);
+            textStyle(BOLD);
             fill(0, 0, 0, 128);
             text("ЗМІЙКОКРАТ", width / 2 + 2, height / 2 + 12);
           pop();
           fill("#86BB39");
           textSize(48);
           textAlign(CENTER, CENTER);
+          textStyle(BOLD);
           text("ЗМІЙКОКРАТ", width / 2, height / 2 + 10);
           
           let alphaMenu = map(sin(frameCount * 0.2), -1, 1, 100, 255);
           fill(134, 187, 57, alphaMenu);
           textSize(24);
-          text("let's begin", width / 2, height / 2 + 50);
+          text("Натисніть Старт", width / 2, height / 2 + 50);
           return;
         }
       }
 
-      // Если игра запущена — отрисовываем поле
+      if (collisionDetected) {
+        let elapsed = millis() - collisionStartTime;
+        blinkVisible = (int(elapsed / blinkInterval) % 2 === 0);
+        if (elapsed > 2000) {
+          collisionDetected = false;
+          gameOver = true;
+          gameStarted = false;
+        }
+        background("#f0f0f0");
+        fill("#343434");
+        noStroke();
+        rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
+        drawGrid();
+        fill("#EC612A");
+        rect(borderThickness + bonus.x * gridSize, borderThickness + bonus.y * gridSize, gridSize, gridSize);
+        if (blinkVisible) {
+          fill("#86BB39");
+          for (let part of snake) {
+            rect(borderThickness + part.x * gridSize, borderThickness + part.y * gridSize, gridSize, gridSize);
+          }
+        }
+        return;
+      }
+
       background("#f0f0f0");
       fill("#343434");
       noStroke();
@@ -410,8 +458,6 @@
       drawGrid();
 
       if (paused) return;
-
-      // Демо-режим (ai)
       if (controlMode === "ai") {
         direction = chooseDirection();
       }
@@ -421,14 +467,14 @@
       let newY = (head.y + direction.dy + rows) % rows;
       let newHead = { x: newX, y: newY };
 
-      // Столкновение => gameOver
       if (collision(newHead)) {
-        gameOver = true;
-        gameStarted = false;
+        if (!collisionDetected) {
+          collisionDetected = true;
+          collisionStartTime = millis();
+        }
       } else {
         snake.push(newHead);
         if (newHead.x === bonus.x && newHead.y === bonus.y) {
-          // Счёт ведём только в режиме user
           if (controlMode === "user") {
             score++;
             updateScore();
@@ -439,7 +485,6 @@
         }
       }
 
-      // Рисуем бонус и змею
       fill("#EC612A");
       rect(borderThickness + bonus.x * gridSize, borderThickness + bonus.y * gridSize, gridSize, gridSize);
       fill("#86BB39");
@@ -448,86 +493,52 @@
       }
     }
 
-    // =============== Логика управления ===============
-    function showStartMenu() {
-      let menuDiv = select('#menu');
-      menuDiv.html("");
-      menuDiv.show();
-
-      // При отображении меню всегда скрываем верхний счётчик
-      scoreDiv.hide();
-
-      if (autoStartTimeout) clearTimeout(autoStartTimeout);
-
-      userButton = createButton('Старт');
-      userButton.class("menu-button");
-      userButton.parent(menuDiv);
-      userButton.mousePressed(() => {
-        if (autoStartTimeout) clearTimeout(autoStartTimeout);
-        controlMode = "user";
-        gameStarted = true;
-        gameOver = false;
-        scoreSubmitted = false;
+    // Единый обработчик ESC
+    function handleGlobalEsc() {
+      // Если открыт pop-up ввода имени, закрываем его
+      if (inputDisplayed) {
+        let inputDiv = select('#record-input');
+        if (inputDiv) inputDiv.remove();
         inputDisplayed = false;
-        menuDiv.hide();
-        resetGame();
-      });
-
-      updateRecordsTable();
-
-      autoStartTimeout = setTimeout(() => {
-        if (!gameStarted) {
-          controlMode = "ai";
-          gameStarted = true;
-          scoreSubmitted = false;
-          inputDisplayed = false;
-          resetGame();
-        }
-      }, 5000);
-    }
-
-    function resetGame() {
-      snake = [];
-      snake.push({ x: floor(cols / 2), y: floor(rows / 2) });
-      direction = { dx: 1, dy: 0 };
-      score = 0;
-      paused = false;
-      gameOver = false;
-      spawnBonus();
-      inputDisplayed = false;
-
-      // Показываем верхний счётчик только в режиме user
-      if (gameStarted && controlMode === "user") {
-        scoreDiv.show();
-        updateScore();
-      } else {
-        scoreDiv.hide();
-      }
-    }
-
-    function keyPressed() {
-      // Если игра окончена — любое нажатие клавиши => переход к меню
-      if (gameOver) {
-        // Если есть новый рекорд, но имя ещё не ввели — ждём, не уходим в меню
-        if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
-          return;
-        }
-        gameOver = false;
-        showStartMenu();
+        scoreSubmitted = true;
         return;
       }
-      if (keyCode === ESCAPE) {
-        if (gameStarted && !paused) {
+      
+      // Если открыт exit popup, закрываем его
+      let exitPopup = select('#exit-popup');
+      if (exitPopup) {
+        exitPopup.remove();
+        return;
+      }
+      
+      // Если игра запущена
+      if (gameStarted) {
+        if (paused) {
+          resumeGame();
+        } else {
           if (controlMode === "ai") {
             showExitPopup();
           } else {
             pauseGame();
           }
-        } else if (paused) {
-          resumeGame();
-        } else if (!gameStarted) {
-          showExitPopup();
         }
+        return;
+      }
+      
+      // Если игра не запущена
+      showExitPopup();
+    }
+
+    function keyPressed() {
+      // Обработка остальных клавиш (стрелок)
+      if (inputDisplayed) return;
+      
+      if (gameOver) {
+        if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
+          return;
+        }
+        gameOver = false;
+        showStartMenu();
         return;
       }
       if (paused) return;
@@ -544,24 +555,33 @@
       }
     }
 
+    // Функция для показа окна выхода
     function showExitPopup() {
       let exitPopupDiv = createDiv('');
       exitPopupDiv.id('exit-popup');
       exitPopupDiv.parent(document.body);
-
       let message = createP('Вийти з гри?');
       message.parent(exitPopupDiv);
-
-      let yesBtn = createButton('Да');
+      let buttonContainer = createDiv('');
+      buttonContainer.parent(exitPopupDiv);
+      buttonContainer.style('display', 'flex');
+      buttonContainer.style('justify-content', 'center');
+      buttonContainer.style('gap', '20px');
+      buttonContainer.style('flex-direction', 'row');
+      let yesBtn = createButton('Так');
       yesBtn.class("menu-button");
-      yesBtn.parent(exitPopupDiv);
+      yesBtn.parent(buttonContainer);
       yesBtn.mousePressed(() => {
-        window.close();
+        // Используем API из preload.js для выхода из приложения
+        if (window.electronAPI && window.electronAPI.quitApp) {
+          window.electronAPI.quitApp();
+        } else {
+          console.log("Electron API не доступно");
+        }
       });
-
-      let noBtn = createButton('Нет');
+      let noBtn = createButton('Ніт');
       noBtn.class("menu-button");
-      noBtn.parent(exitPopupDiv);
+      noBtn.parent(buttonContainer);
       noBtn.mousePressed(() => {
         exitPopupDiv.remove();
       });
@@ -571,24 +591,14 @@
       paused = true;
       createPauseMenu();
     }
-
     function resumeGame() {
       paused = false;
       removePauseMenu();
     }
-
     function createPauseMenu() {
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
-
-      let resumeBtn = createButton('Продовжити');
-      resumeBtn.class("menu-button");
-      resumeBtn.parent(pauseMenuDiv);
-      resumeBtn.mousePressed(() => {
-        resumeGame();
-      });
-
       let exitBtn = createButton('Головне меню');
       exitBtn.class("menu-button");
       exitBtn.parent(pauseMenuDiv);
@@ -600,7 +610,6 @@
         showStartMenu();
       });
     }
-
     function removePauseMenu() {
       if (pauseMenuDiv) {
         pauseMenuDiv.remove();
@@ -608,7 +617,6 @@
       }
     }
 
-    // =============== Вспомогательные функции ===============
     function spawnBonus() {
       let valid = false;
       let x, y;
@@ -660,7 +668,6 @@
         { dx: 0, dy: 1 },
         { dx: 0, dy: -1 }
       ];
-      // Жадная сортировка по расстоянию
       moves.sort((a, b) => {
         let newAX = (head.x + a.dx + cols) % cols;
         let newAY = (head.y + a.dy + rows) % rows;
@@ -714,6 +721,56 @@
           noStroke();
           rect(x + j * s, y + i * s, s, s);
         }
+      }
+    }
+
+    function showStartMenu() {
+      let menuDiv = select('#menu');
+      menuDiv.html("");
+      menuDiv.show();
+      scoreDiv.hide();
+      if (autoStartTimeout) clearTimeout(autoStartTimeout);
+      userButton = createButton('Старт');
+      userButton.class("menu-button");
+      userButton.parent(menuDiv);
+      userButton.mousePressed(() => {
+        if (autoStartTimeout) clearTimeout(autoStartTimeout);
+        controlMode = "user";
+        gameStarted = true;
+        gameOver = false;
+        scoreSubmitted = false;
+        inputDisplayed = false;
+        menuDiv.hide();
+        resetGame();
+      });
+      updateRecordsTable();
+      autoStartTimeout = setTimeout(() => {
+        if (!gameStarted) {
+          controlMode = "ai";
+          gameStarted = true;
+          scoreSubmitted = false;
+          inputDisplayed = false;
+          resetGame();
+        }
+      }, 5000);
+    }
+
+    function resetGame() {
+      snake = [];
+      snake.push({ x: floor(cols / 2), y: floor(rows / 2) });
+      direction = { dx: 1, dy: 0 };
+      score = 0;
+      paused = false;
+      gameOver = false;
+      collisionDetected = false;
+      blinkVisible = true;
+      spawnBonus();
+      inputDisplayed = false;
+      if (gameStarted && controlMode === "user") {
+        scoreDiv.show();
+        updateScore();
+      } else {
+        scoreDiv.hide();
       }
     }
   </script>

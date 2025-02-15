@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ЗМІЙКОКРАТ</title>
+  <title><b>ЗМІЙКОКРАТ</b></title>
   <!-- Подключаем p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+  <!-- Подключаем p5.sound для звуков -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
   <!-- Подключаем шрифт "Press Start 2P" -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
@@ -20,15 +22,26 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeSpeed;
     }
+    /* При активном попапе отключаем pointer-events для всех кнопок */
+    body.popup-active button {
+      pointer-events: none;
+    }
+    /* Но внутри pop-up кнопки остаются активными */
+    body.popup-active #record-input button,
+    body.popup-active #exit-popup button,
+    body.popup-active #pause-menu button {
+      pointer-events: auto;
+    }
     #wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+    /* Уменьшаем отступ игрового поля до 20px */
     #game-container {
       display: flex;
       justify-content: center;
-      margin-top: 100px;
+      margin-top: 20px;
     }
     #menu {
       display: flex;
@@ -54,9 +67,10 @@
     .menu-button:hover {
       background-color: #75A730;
     }
+    /* Пересчитан верхний отступ счётчика: 20px + 440px + 20px */
     .score-container {
       position: absolute;
-      top: calc(20px + 440px + 100px);
+      top: calc(20px + 440px + 20px);
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
@@ -65,12 +79,13 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
+    /* Попапы – непрозрачные */
     #pause-menu, #record-input, #exit-popup {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.85);
+      background: rgb(0, 0, 0);
       padding: 20px;
       border-radius: 8px;
       text-align: center;
@@ -78,31 +93,10 @@
       font-family: 'Press Start 2P', sans-serif;
       color: #fff;
     }
-    #pause-menu .menu-button, #exit-popup .menu-button {
-      font-family: 'Press Start 2P', sans-serif;
-      font-size: 16px;
-      padding: 10px 20px;
-      background-color: #86BB39;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin: 10px 0;
-    }
-    #pause-menu .menu-button:hover, #exit-popup .menu-button:hover {
-      background-color: #75A730;
-    }
-    #record-input {
-      background: rgba(50, 50, 50, 0.9);
-      border: 2px solid #66779A;
-      padding: 20px;
-      border-radius: 8px;
-    }
     #record-table {
       margin-top: 20px;       
       display: block;
-      background: rgba(0,0,0,0.6);
+      background: rgb(0, 0, 0);
       padding: 10px;
       border-radius: 8px;
       font-size: 14px;
@@ -130,6 +124,13 @@
       text-align: right;
       margin-left: 10px;
     }
+    /* Стили для футера с надписью tehnokrat.ua */
+    #record-footer {
+      font-family: 'Press Start 2P', sans-serif;
+      font-size: 14px;
+      color: #66779A;
+      margin-top: 10px;
+    }
     input.name-input {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 16px;
@@ -139,7 +140,7 @@
       background-color: #000;
       border: 2px solid #EC612A;
       caret-color: #EC612A;
-      margin-bottom: 10px;
+      margin-bottom: 20px !important;
     }
     button.name-submit {
       font-family: 'Press Start 2P', sans-serif;
@@ -151,7 +152,7 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
-      margin-top: 10px;
+      margin: 0 auto;
     }
     button.name-submit:hover {
       background-color: #75A730;
@@ -165,21 +166,8 @@
     }
     #exit-popup .menu-button {
       margin: 10px;
-    }
-    #exit-popup .menu-button + .menu-button {
-      margin-top: 20px;
-    }
-    #exit-popup .menu-button {
-      font-family: 'Press Start 2P', sans-serif;
-      font-size: 16px;
-      padding: 10px 20px;
-      background-color: #86BB39;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin: 10px;
+      width: 100px;
+      height: 50px;
     }
     #exit-popup .menu-button:hover {
       background-color: #75A730;
@@ -211,6 +199,12 @@
     let gameOver = false;
     let canvas;
 
+    // Переменные для режима столкновения и мигания
+    let collisionDetected = false;
+    let collisionStartTime = 0;
+    let blinkInterval = 300;
+    let blinkVisible = true;
+
     // Интерфейс
     let userButton;
     let scoreDiv;
@@ -218,6 +212,7 @@
 
     // Рекорды
     let records = [];
+    let lastUpdatedUser = null;
 
     // Авто-демо
     let autoStartTimeout = null;
@@ -226,18 +221,37 @@
     let inputDisplayed = false;
     let scoreSubmitted = false;
 
-    let blink = false;
-    let isBlinking = false;
-    let blinkInterval;
-    let stopTimeout;
+    // Звуковой генератор для звуковых эффектов
+    let osc; 
+    // Отдельный осциллятор для фоновой музыки
+    let bgOsc; 
 
-    // =============== Работа с рекордами ===============
+    // Фоновая мелодия (набор нот) и переменная для текущей ноты
+    let melody = [
+      { freq: 262, duration: 300 }, // C4
+      { freq: 294, duration: 300 }, // D4
+      { freq: 330, duration: 300 }, // E4
+      { freq: 349, duration: 300 }, // F4
+      { freq: 392, duration: 300 }, // G4
+      { freq: 440, duration: 300 }, // A4
+      { freq: 494, duration: 300 }, // B4
+      { freq: 523, duration: 300 }  // C5
+    ];
+    let currentNoteIndex = 0;
+
+    // Функции для управления состоянием pop-up
+    function activatePopup() {
+      document.body.classList.add("popup-active");
+    }
+    function deactivatePopup() {
+      document.body.classList.remove("popup-active");
+    }
+
     function loadRecords() {
       try {
         let stored = localStorage.getItem("snakeRecords");
         if (stored) {
           records = JSON.parse(stored);
-          // Обрезаем до 10, если больше
           if (records.length > 10) {
             records = records.slice(0, 10);
             localStorage.setItem("snakeRecords", JSON.stringify(records));
@@ -248,6 +262,22 @@
       } catch(e) {
         console.error("Ошибка доступа к localStorage:", e);
         records = [];
+      }
+      if (records.length === 0) {
+        const defaultRecords = [
+          { name: "Олександр", score: 10 },
+          { name: "Андрій", score: 9 },
+          { name: "Іван", score: 8 },
+          { name: "Микола", score: 7 },
+          { name: "Сергій", score: 6 },
+          { name: "Володимир", score: 5 },
+          { name: "Юрій", score: 4 },
+          { name: "Петро", score: 3 },
+          { name: "Дмитро", score: 2 },
+          { name: "Богдан", score: 1 }
+        ];
+        records = defaultRecords;
+        saveRecords();
       }
     }
     function saveRecords() {
@@ -267,16 +297,31 @@
       }
       let html = "<h3>Топ гравців</h3><ol>";
       records.forEach(r => {
-        html += `<li>${r.name}: <span class="score-number">${r.score}</span></li>`;
+        let nameHtml = r.name;
+        if (r.name === lastUpdatedUser) {
+          nameHtml = `<span style="color: #EC612A;">${r.name}</span>`;
+        }
+        html += `<li>${nameHtml}: <span class="score-number">${r.score}</span></li>`;
       });
       html += "</ol>";
       recordDiv.html(html);
+      
+      // Добавляем под таблицей рекордов надпись "tehnokrat.ua"
+      let footer = select("#record-footer");
+      if (!footer) {
+        footer = createDiv("tehnokrat.ua");
+        footer.id("record-footer");
+        footer.parent(menuDiv);
+      } else {
+        footer.html("tehnokrat.ua");
+      }
     }
     function qualifies(score) {
       if (records.length < 10) return true;
       return score > records[records.length - 1].score;
     }
     function addRecord(name, score) {
+      lastUpdatedUser = name;
       records.push({ name, score });
       records.sort((a, b) => b.score - a.score);
       if (records.length > 10) records.pop();
@@ -284,7 +329,30 @@
       updateRecordsTable();
     }
 
+    // Функция для воспроизведения короткого звукового эффекта
+    function playBeep(freq, duration) {
+      osc.freq(freq);
+      osc.amp(0.5, 0.05);
+      setTimeout(() => {
+        osc.amp(0, 0.05);
+      }, duration);
+    }
+
+    // Функция фоновой музыки (циклический саундтрек в стиле ZX Spectrum)
+    function playBackgroundMusic() {
+      if (!gameStarted) return;
+      let note = melody[currentNoteIndex];
+      bgOsc.freq(note.freq);
+      bgOsc.amp(0.2, 0.05);
+      setTimeout(() => {
+        bgOsc.amp(0, 0.05);
+        currentNoteIndex = (currentNoteIndex + 1) % melody.length;
+        playBackgroundMusic();
+      }, note.duration);
+    }
+
     function showNameInput() {
+      activatePopup();
       let inputDiv = createDiv("");
       inputDiv.id("record-input");
       inputDiv.parent(document.body);
@@ -294,7 +362,7 @@
       title.style("color", "#EC612A");
       title.parent(inputDiv);
       
-      let info = createP("Введіть своє ім'я (до 12 знаків):");
+      let info = createP("Введіть своє ім'я:");
       info.parent(inputDiv);
       
       let nameInput = createInput("");
@@ -306,41 +374,47 @@
       let submitBtn = createButton("OK");
       submitBtn.class("name-submit");
       submitBtn.parent(inputDiv);
-      submitBtn.mousePressed(submitRecord);
+      submitBtn.mousePressed(() => {
+        let name = nameInput.value().trim();
+        if (name === "") name = "ANON";
+        addRecord(name, score);
+        scoreSubmitted = true;
+        inputDisplayed = false;
+        inputDiv.remove();
+        deactivatePopup();
+      });
 
       nameInput.elt.addEventListener('keydown', function(evt) {
         evt.stopPropagation();
         if (evt.key === 'Enter') {
           evt.preventDefault();
-          submitRecord();
+          let name = nameInput.value().trim();
+          if (name === "") name = "ANON";
+          addRecord(name, score);
+          scoreSubmitted = true;
+          inputDisplayed = false;
+          inputDiv.remove();
+          deactivatePopup();
         }
       });
-      function escHandler(e) {
-        if (e.key === 'Escape') {
-          e.stopPropagation();
-          removeEscHandler();
-          inputDiv.remove();
-          scoreSubmitted = true;
-        }
-      }
-      function removeEscHandler() {
-        nameInput.elt.removeEventListener('keydown', escHandler);
-        document.removeEventListener('keydown', escHandler);
-      }
-      inputDiv.elt.addEventListener('keydown', escHandler);
-      document.addEventListener('keydown', escHandler);
-
-      function submitRecord() {
-        let name = nameInput.value().trim();
-        if (name === "") name = "ANON";
-        addRecord(name, score);
-        scoreSubmitted = true;
-        removeEscHandler();
-        inputDiv.remove();
-      }
     }
 
-    // =============== p5: setup, draw ===============
+    function showGameOverScreen() {
+      background("#1c1c1c");
+      noStroke();
+      fill(0, 150);
+      rect(0, 0, width, height);
+      fill("#FF4136");
+      textAlign(CENTER, CENTER);
+      textSize(60);
+      textStyle(BOLD);
+      text("GAME OVER", width / 2, height / 2 - 60);
+      textSize(24);
+      fill(200);
+      text("Змійка загубилась!", width / 2, height / 2 + 40);
+      updateRecordsTable();
+    }
+
     function setup() {
       pixelDensity(1);
       canvas = createCanvas(canvasWidth, canvasHeight);
@@ -348,7 +422,16 @@
       canvas.parent('game-container');
       frameRate(10);
 
-      // Блок счёта
+      // Инициализируем осциллятор для звуковых эффектов
+      osc = new p5.Oscillator('square');
+      osc.amp(0);
+      osc.start();
+
+      // Инициализируем осциллятор для фоновой музыки
+      bgOsc = new p5.Oscillator('square');
+      bgOsc.amp(0);
+      bgOsc.start();
+
       scoreDiv = createDiv("Рахунок: 0");
       scoreDiv.class("score-container");
       scoreDiv.parent(document.body);
@@ -357,9 +440,16 @@
       showStartMenu();
       resetGame();
 
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          e.stopPropagation();
+          handleGlobalEsc();
+        }
+      });
+
       document.addEventListener('keydown', (e) => {
-        // Если игра не запущена и нажали Enter => запуск
-        if (!gameStarted && e.key === 'Enter') {
+        if (!gameStarted && (e.key === 'Enter' || e.key === 'Return' || e.code === 'NumpadEnter')) {
+          e.preventDefault();
           if (userButton) {
             userButton.elt.click();
           }
@@ -368,43 +458,26 @@
     }
 
     function draw() {
-      // Если игра не запущена
       if (!gameStarted) {
-        // Если gameOver, показываем экран "GAME OVER"
         if (gameOver) {
-          // Если игрок набрал рекорд, имя не введено, и окно ввода не показывали
-          if (controlMode === "user" && qualifies(score) && !scoreSubmitted && !inputDisplayed) {
-            showNameInput();
+          if (controlMode === "ai") {
+            resetGame();
             return;
           }
-          // Отрисовка фона Game Over
-          background("#1c1c1c");
-          noStroke();
-          fill(0, 150);
-          rect(0, 0, width, height);
-
-          // Текст "GAME OVER"
-          fill("#FF4136");
-          textAlign(CENTER, CENTER);
-          textSize(60);
-          textStyle(BOLD);
-          text("GAME OVER", width / 2, height / 2 - 60);
-
-          // "Спробуємо ще?"
-          textSize(24);
-          fill(200);
-          text("Спробуємо ще?", width / 2, height / 2 + 40);
+          if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
+            if (!inputDisplayed) {
+              showNameInput();
+            }
+            return;
+          }
+          showGameOverScreen();
           return;
         } else {
-          // Заставка
-          background("#1c1c1c");
-
-          // Рисуем рамку, как у игрового поля
-          stroke("#FFFFFF"); // Устанавливаем светлый цвет обводки
-          strokeWeight(2);
-          noFill();
+          background("#f0f0f0");
+          noStroke();
+          fill("#1c1c1c");
           rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
-
+          
           let s = 10;
           let artW = 8 * s;
           let artH = 8 * s;
@@ -413,32 +486,55 @@
           push();
             textSize(48);
             textAlign(CENTER, CENTER);
+            textStyle(BOLD);
             fill(0, 0, 0, 128);
             text("ЗМІЙКОКРАТ", width / 2 + 2, height / 2 + 12);
           pop();
           fill("#86BB39");
           textSize(48);
           textAlign(CENTER, CENTER);
+          textStyle(BOLD);
           text("ЗМІЙКОКРАТ", width / 2, height / 2 + 10);
           
           let alphaMenu = map(sin(frameCount * 0.2), -1, 1, 100, 255);
           fill(134, 187, 57, alphaMenu);
           textSize(24);
-          text("let's begin", width / 2, height / 2 + 50);
+          text("Натисніть Старт", width / 2, height / 2 + 50);
           return;
         }
       }
 
-      // Если игра запущена — отрисовываем поле
+      if (collisionDetected) {
+        let elapsed = millis() - collisionStartTime;
+        blinkVisible = (int(elapsed / blinkInterval) % 2 === 0);
+        if (elapsed > 2000) {
+          collisionDetected = false;
+          gameOver = true;
+          gameStarted = false;
+        }
+        background("#f0f0f0");
+        fill("#343434");
+        noStroke();
+        rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
+        drawGrid();
+        fill("#EC612A");
+        rect(borderThickness + bonus.x * gridSize, borderThickness + bonus.y * gridSize, gridSize, gridSize);
+        if (blinkVisible) {
+          fill("#86BB39");
+          for (let part of snake) {
+            rect(borderThickness + part.x * gridSize, borderThickness + part.y * gridSize, gridSize, gridSize);
+          }
+        }
+        return;
+      }
+
       background("#f0f0f0");
       fill("#343434");
       noStroke();
       rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
       drawGrid();
 
-      if (paused || isBlinking) return;
-
-      // Демо-режим (ai)
+      if (paused) return;
       if (controlMode === "ai") {
         direction = chooseDirection();
       }
@@ -448,18 +544,21 @@
       let newY = (head.y + direction.dy + rows) % rows;
       let newHead = { x: newX, y: newY };
 
-      // Столкновение => gameOver
       if (collision(newHead)) {
-        gameOver = true;
-        gameStarted = false;
-        startBlinking();
+        if (!collisionDetected) {
+          collisionDetected = true;
+          collisionStartTime = millis();
+          // Проигрываем звук столкновения (низкий тон)
+          playBeep(150, 200);
+        }
       } else {
         snake.push(newHead);
         if (newHead.x === bonus.x && newHead.y === bonus.y) {
-          // Счёт ведём только в режиме user
           if (controlMode === "user") {
             score++;
             updateScore();
+            // Проигрываем звук поедания бонуса (высокий тон)
+            playBeep(600, 100);
           }
           spawnBonus();
         } else {
@@ -467,93 +566,56 @@
         }
       }
 
-      // Рисуем бонус и змею
       fill("#EC612A");
       rect(borderThickness + bonus.x * gridSize, borderThickness + bonus.y * gridSize, gridSize, gridSize);
-      if (!blink) {
-        fill("#86BB39");
-      } else {
-        fill("#FF4136");
-      }
+      fill("#86BB39");
       for (let part of snake) {
         rect(borderThickness + part.x * gridSize, borderThickness + part.y * gridSize, gridSize, gridSize);
       }
     }
 
-    function showStartMenu() {
-      let menuDiv = select('#menu');
-      menuDiv.html("");
-      menuDiv.show();
-      scoreDiv.hide();
-
-      if (autoStartTimeout) clearTimeout(autoStartTimeout);
-
-      userButton = createButton('Старт');
-      userButton.class("menu-button");
-      userButton.parent(menuDiv);
-      userButton.mousePressed(() => {
-        if (autoStartTimeout) clearTimeout(autoStartTimeout);
-        controlMode = "user";
-        gameStarted = true;
-        gameOver = false;
-        scoreSubmitted = false;
+    function handleGlobalEsc() {
+      if (inputDisplayed) {
+        let inputDiv = select('#record-input');
+        if (inputDiv) inputDiv.remove();
         inputDisplayed = false;
-        menuDiv.hide();
-        resetGame();
-      });
-
-      updateRecordsTable();
-
-      autoStartTimeout = setTimeout(() => {
-        if (!gameStarted) {
-          controlMode = "ai";
-          gameStarted = true;
-          scoreSubmitted = false;
-          inputDisplayed = false;
-          resetGame();
-        }
-      }, 5000);
-    }
-
-    function resetGame() {
-      snake = [];
-      snake.push({ x: floor(cols / 2), y: floor(rows / 2) });
-      direction = { dx: 1, dy: 0 };
-      score = 0;
-      paused = false;
-      gameOver = false;
-      spawnBonus();
-      inputDisplayed = false;
-
-      if (gameStarted && controlMode === "user") {
-        scoreDiv.show();
-        updateScore();
-      } else {
-        scoreDiv.hide();
+        scoreSubmitted = true;
+        deactivatePopup();
+        return;
       }
+      
+      let exitPopup = select('#exit-popup');
+      if (exitPopup) {
+        exitPopup.remove();
+        deactivatePopup();
+        return;
+      }
+      
+      if (gameStarted) {
+        if (paused) {
+          resumeGame();
+        } else {
+          if (controlMode === "ai") {
+            showExitPopup();
+          } else {
+            pauseGame();
+          }
+        }
+        return;
+      }
+      
+      showExitPopup();
     }
 
     function keyPressed() {
+      if (inputDisplayed) return;
+      
       if (gameOver) {
         if (controlMode === "user" && qualifies(score) && !scoreSubmitted) {
           return;
         }
         gameOver = false;
         showStartMenu();
-        return;
-      }
-      if (keyCode === ESCAPE) {
-        if (gameStarted && !paused) {
-          if (controlMode === "ai") {
-            showExitPopup();
-          } else {
-            pauseGame();
-          }
-        } else if (paused) {
-          resumeGame();
-        } else if (!gameStarted) {
-          showExitPopup();
-        }
         return;
       }
       if (paused) return;
@@ -570,43 +632,32 @@
       }
     }
 
-    const { remote } = require('electron');
     function showExitPopup() {
+      activatePopup();
       let exitPopupDiv = createDiv('');
       exitPopupDiv.id('exit-popup');
       exitPopupDiv.parent(document.body);
-
       let message = createP('Вийти з гри?');
       message.parent(exitPopupDiv);
-
       let buttonContainer = createDiv('');
       buttonContainer.parent(exitPopupDiv);
       buttonContainer.style('display', 'flex');
       buttonContainer.style('justify-content', 'center');
       buttonContainer.style('gap', '20px');
-
+      buttonContainer.style('flex-direction', 'row');
       let yesBtn = createButton('Так');
       yesBtn.class("menu-button");
       yesBtn.parent(buttonContainer);
       yesBtn.mousePressed(() => {
-        remote.app.quit();
+        window.close();
       });
-
-      let noBtn = createButton('Ні');
+      let noBtn = createButton('Ніт');
       noBtn.class("menu-button");
       noBtn.parent(buttonContainer);
       noBtn.mousePressed(() => {
         exitPopupDiv.remove();
-        document.removeEventListener('keydown', handleKeyPress);
+        deactivatePopup();
       });
-
-      function handleKeyPress(event) {
-        if (event.key === 'Escape') {
-          exitPopupDiv.remove();
-          document.removeEventListener('keydown', handleKeyPress);
-        }
-      }
-      document.addEventListener('keydown', handleKeyPress);
     }
 
     function pauseGame() {
@@ -616,12 +667,13 @@
     function resumeGame() {
       paused = false;
       removePauseMenu();
+      deactivatePopup();
     }
     function createPauseMenu() {
+      activatePopup();
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
-
       let exitBtn = createButton('Головне меню');
       exitBtn.class("menu-button");
       exitBtn.parent(pauseMenuDiv);
@@ -631,6 +683,7 @@
         removePauseMenu();
         resetGame();
         showStartMenu();
+        deactivatePopup();
       });
     }
     function removePauseMenu() {
@@ -640,7 +693,6 @@
       }
     }
 
-    // Вспомогательные функции
     function spawnBonus() {
       let valid = false;
       let x, y;
@@ -692,7 +744,6 @@
         { dx: 0, dy: 1 },
         { dx: 0, dy: -1 }
       ];
-      // Жадная сортировка по расстоянию до бонуса
       moves.sort((a, b) => {
         let newAX = (head.x + a.dx + cols) % cols;
         let newAY = (head.y + a.dy + rows) % rows;
@@ -749,19 +800,59 @@
       }
     }
 
-    function startBlinking() {
-      isBlinking = true;
-      blink = true;
-      blinkInterval = setInterval(() => {
-        blink = !blink;
-      }, 200);
+    function showStartMenu() {
+      let menuDiv = select('#menu');
+      menuDiv.html("");
+      menuDiv.show();
+      scoreDiv.hide();
+      if (autoStartTimeout) clearTimeout(autoStartTimeout);
+      userButton = createButton('Старт');
+      userButton.class("menu-button");
+      userButton.parent(menuDiv);
+      userButton.mousePressed(() => {
+        // Активация аудио после первого клика
+        userStartAudio();
+        if (autoStartTimeout) clearTimeout(autoStartTimeout);
+        controlMode = "user";
+        gameStarted = true;
+        gameOver = false;
+        scoreSubmitted = false;
+        inputDisplayed = false;
+        menuDiv.hide();
+        resetGame();
+        // Запускаем фоновую музыку
+        playBackgroundMusic();
+      });
+      updateRecordsTable();
+      autoStartTimeout = setTimeout(() => {
+        if (!gameStarted) {
+          controlMode = "ai";
+          gameStarted = true;
+          scoreSubmitted = false;
+          inputDisplayed = false;
+          resetGame();
+          playBackgroundMusic();
+        }
+      }, 5000);
+    }
 
-      stopTimeout = setTimeout(() => {
-        clearInterval(blinkInterval);
-        blink = false;
-        isBlinking = false;
-        showStartMenu();
-      }, 2000);
+    function resetGame() {
+      snake = [];
+      snake.push({ x: floor(cols / 2), y: floor(rows / 2) });
+      direction = { dx: 1, dy: 0 };
+      score = 0;
+      paused = false;
+      gameOver = false;
+      collisionDetected = false;
+      blinkVisible = true;
+      spawnBonus();
+      inputDisplayed = false;
+      if (gameStarted && controlMode === "user") {
+        scoreDiv.show();
+        updateScore();
+      } else {
+        scoreDiv.hide();
+      }
     }
   </script>
 </body>

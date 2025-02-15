@@ -26,11 +26,11 @@
       flex-direction: column;
       align-items: center;
     }
-    /* Контейнер для канвы игры */
+    /* Контейнер для канвы игры (увеличили отступ сверху) */
     #game-container {
       display: flex;
       justify-content: center;
-      margin-top: 20px; 
+      margin-top: 100px; /* <-- было 20px, теперь 40px */
     }
     /* Меню: кнопка "Старт" и таблица рекордов */
     #menu {
@@ -58,7 +58,7 @@
     }
     .score-container {
       position: absolute;
-      top: calc(20px + 440px + 20px);
+      top: calc(20px + 440px + 100px); /* <-- увеличен отступ сверху на 20px */
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
@@ -67,7 +67,7 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
-    #pause-menu, #record-input {
+    #pause-menu, #record-input, #exit-popup {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -77,6 +77,25 @@
       border-radius: 8px;
       text-align: center;
       z-index: 9999;
+      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
+      color: #fff; /* Цвет текста */
+    }
+
+    #pause-menu .menu-button, #exit-popup .menu-button {
+      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
+      font-size: 16px;
+      padding: 10px 20px;
+      background-color: #86BB39;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 10px 0; /* Отступ между кнопками */
+    }
+
+    #pause-menu .menu-button:hover, #exit-popup .menu-button:hover {
+      background-color: #75A730;
     }
     /* Окно ввода рекорда */
     #record-input {
@@ -94,7 +113,7 @@
       font-size: 14px;
       margin-left: auto;
       margin-right: auto;
-      max-width: 400px; /* <-- Добавлено, чтобы таблица не превышала ширину игрового поля */
+      max-width: 400px;
     }
     #record-table h3 {
       color: #66779A;
@@ -104,7 +123,8 @@
       list-style-position: inside;
       margin: 0;
       padding: 0;
-      line-height: 1.5;
+      /* Увеличиваем межстрочный отступ */
+      line-height: 1.8; /* <-- изменено с 1.5 на 1.8 */
       text-align: left;
     }
     #record-table li {
@@ -148,6 +168,34 @@
     canvas {
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+    }
+    /* ---- Добавлен отступ между кнопками в меню паузы ---- */
+    #pause-menu .menu-button:not(:last-child) {
+      margin-right: 10px;
+    }
+    #exit-popup .menu-button {
+      margin: 10px; /* Отступ между кнопками */
+    }
+
+    #exit-popup .menu-button + .menu-button {
+      margin-top: 20px; /* Увеличенный отступ между кнопками */
+    }
+
+    #exit-popup .menu-button {
+      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
+      font-size: 16px;
+      padding: 10px 20px;
+      background-color: #86BB39;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 10px; /* Отступ между кнопками */
+    }
+
+    #exit-popup .menu-button:hover {
+      background-color: #75A730;
     }
   </style>
 </head>
@@ -199,6 +247,10 @@
         let stored = localStorage.getItem("snakeRecords");
         if (stored) {
           records = JSON.parse(stored);
+          // Ограничиваем количество рекордов до 10
+          if (records.length > 10) {
+            records = records.slice(0, 10);
+          }
         } else {
           records = [];
         }
@@ -229,6 +281,7 @@
       html += "</ol>";
       recordDiv.html(html);
     }
+    // Увеличили лимит рекордов до 10
     function qualifies(score) {
       if (records.length < 10) return true;
       return score > records[records.length - 1].score;
@@ -236,6 +289,7 @@
     function addRecord(name, score) {
       records.push({ name, score });
       records.sort((a, b) => b.score - a.score);
+      // Если записей больше 10, удаляем лишние
       if (records.length > 10) records.pop();
       saveRecords();
       updateRecordsTable();
@@ -348,10 +402,10 @@
           textStyle(BOLD);
           text("GAME OVER", width / 2, height / 2 - 60);
 
-          // "Press any key"
+          // "Спробуємо ще?"
           textSize(24);
           fill(200);
-          text("Press any key", width / 2, height / 2 + 40);
+          text("Спробуємо ще?", width / 2, height / 2 + 40);
           return;
         } else {
           // Заставка
@@ -365,17 +419,17 @@
             textSize(48);
             textAlign(CENTER, CENTER);
             fill(0, 0, 0, 128);
-            text("Змійкократ", width / 2 + 2, height / 2 + 12);
+            text("ЗМІЙКОКРАТ", width / 2 + 2, height / 2 + 12);
           pop();
           fill("#86BB39");
           textSize(48);
           textAlign(CENTER, CENTER);
-          text("Змійкократ", width / 2, height / 2 + 10);
+          text("ЗМІЙКОКРАТ", width / 2, height / 2 + 10);
           
           let alphaMenu = map(sin(frameCount * 0.2), -1, 1, 100, 255);
           fill(134, 187, 57, alphaMenu);
           textSize(24);
-          text("Виберіть режим керування", width / 2, height / 2 + 50);
+          text("let's begin", width / 2, height / 2 + 50);
           return;
         }
       }
@@ -495,10 +549,16 @@
         return;
       }
       if (keyCode === ESCAPE) {
-        if (!paused) {
-          pauseGame();
-        } else {
+        if (gameStarted && !paused) {
+          if (controlMode === "ai") {
+            showExitPopup();
+          } else {
+            pauseGame();
+          }
+        } else if (paused) {
           resumeGame();
+        } else if (!gameStarted) {
+          showExitPopup();
         }
         return;
       }
@@ -516,27 +576,63 @@
       }
     }
 
+    const { remote } = require('electron');
+
+    function showExitPopup() {
+      let exitPopupDiv = createDiv('');
+      exitPopupDiv.id('exit-popup');
+      exitPopupDiv.parent(document.body);
+
+      let message = createP('Вийти з гри?');
+      message.parent(exitPopupDiv);
+
+      let buttonContainer = createDiv('');
+      buttonContainer.parent(exitPopupDiv);
+      buttonContainer.style('display', 'flex');
+      buttonContainer.style('justify-content', 'center');
+      buttonContainer.style('gap', '20px'); // Увеличенный отступ между кнопками
+
+      let yesBtn = createButton('Так');
+      yesBtn.class("menu-button");
+      yesBtn.parent(buttonContainer);
+      yesBtn.mousePressed(() => {
+        remote.app.quit();
+      });
+
+      let noBtn = createButton('Ні');
+      noBtn.class("menu-button");
+      noBtn.parent(buttonContainer);
+      noBtn.mousePressed(() => {
+        exitPopupDiv.remove();
+        document.removeEventListener('keydown', handleKeyPress);
+      });
+
+      function handleKeyPress(event) {
+        if (event.key === 'Escape') {
+          exitPopupDiv.remove();
+          document.removeEventListener('keydown', handleKeyPress);
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyPress);
+    }
+
     function pauseGame() {
       paused = true;
       createPauseMenu();
     }
+
     function resumeGame() {
       paused = false;
       removePauseMenu();
     }
+
     function createPauseMenu() {
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
 
-      let resumeBtn = createButton('Продовжити');
-      resumeBtn.class("menu-button");
-      resumeBtn.parent(pauseMenuDiv);
-      resumeBtn.mousePressed(() => {
-        resumeGame();
-      });
-
-      let exitBtn = createButton('Вихід у головне меню');
+      let exitBtn = createButton('Головне меню');
       exitBtn.class("menu-button");
       exitBtn.parent(pauseMenuDiv);
       exitBtn.mousePressed(() => {
@@ -547,6 +643,7 @@
         showStartMenu();
       });
     }
+
     function removePauseMenu() {
       if (pauseMenuDiv) {
         pauseMenuDiv.remove();
@@ -594,7 +691,7 @@
         bodyToCheck.shift();
       }
       for (let segment of bodyToCheck) {
-        if (segment.x === newHead.x && segment.y === newHead.y) return true;
+        if (segment.x === newHead.x && newHead.y === segment.y) return true;
       }
       return false;
     }

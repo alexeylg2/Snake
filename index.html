@@ -4,6 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><b>ЗМІЙКОКРАТ</b></title>
+  <!-- Проверка на мобильные устройства: если мобильное, заменяем содержимое документа -->
+  <script>
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      document.documentElement.innerHTML = `
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Игра недоступна</title>
+          <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+          <style>
+            body { 
+              background: #000; 
+              color: #fff; 
+              font-family: 'Press Start 2P', sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Игра доступна только на десктопных устройствах</h1>
+        </body>`;
+      throw new Error("Мобильные устройства не поддерживаются");
+    }
+  </script>
   <!-- Подключаем p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
   <!-- Подключаем p5.sound для звуков -->
@@ -22,7 +50,7 @@
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeSpeed;
     }
-    /* При активном попапе отключаем pointer-events для всех кнопок */
+    /* При активном pop-up отключаем pointer-events для всех кнопок */
     body.popup-active button {
       pointer-events: none;
     }
@@ -168,13 +196,6 @@
   </style>
 </head>
 <body>
-  <!-- Проверка на мобильное устройство: если мобильное, выводим сообщение и останавливаем скрипт -->
-  <script>
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
-      document.body.innerHTML = '<h1 style="font-family: \'Press Start 2P\', sans-serif; text-align: center; margin-top: 50px;">Игра доступна только на десктопных устройствах</h1>';
-      throw new Error("Мобильные устройства не поддерживаются");
-    }
-  </script>
   <div id="wrapper">
     <div id="game-container"></div>
     <div id="menu"></div>

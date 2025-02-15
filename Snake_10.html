@@ -30,7 +30,7 @@
     #game-container {
       display: flex;
       justify-content: center;
-      margin-top: 100px; /* <-- было 20px, теперь 40px */
+      margin-top: 40px; /* <-- было 20px, теперь 40px */
     }
     /* Меню: кнопка "Старт" и таблица рекордов */
     #menu {
@@ -43,7 +43,6 @@
       text-align: center;      /* Текст внутри меню по центру */
     }
     .menu-button {
-      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
       font-size: 18px;
       padding: 10px 20px;
       background-color: #86BB39;
@@ -59,7 +58,7 @@
     }
     .score-container {
       position: absolute;
-      top: calc(20px + 440px + 100px); /* <-- увеличен отступ сверху на 20px */
+      top: calc(20px + 440px + 40px); /* <-- увеличен отступ сверху на 20px */
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.6);
@@ -68,7 +67,7 @@
       font-size: 20px;
       font-family: 'Press Start 2P', sans-serif;
     }
-    #pause-menu, #record-input, #exit-popup {
+    #pause-menu, #record-input {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -78,25 +77,6 @@
       border-radius: 8px;
       text-align: center;
       z-index: 9999;
-      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
-      color: #fff; /* Цвет текста */
-    }
-
-    #pause-menu .menu-button, #exit-popup .menu-button {
-      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
-      font-size: 16px;
-      padding: 10px 20px;
-      background-color: #86BB39;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin: 10px 0; /* Отступ между кнопками */
-    }
-
-    #pause-menu .menu-button:hover, #exit-popup .menu-button:hover {
-      background-color: #75A730;
     }
     /* Окно ввода рекорда */
     #record-input {
@@ -174,30 +154,6 @@
     #pause-menu .menu-button:not(:last-child) {
       margin-right: 10px;
     }
-    #exit-popup .menu-button {
-      margin: 10px; /* Отступ между кнопками */
-    }
-
-    #exit-popup .menu-button + .menu-button {
-      margin-top: 20px; /* Увеличенный отступ между кнопками */
-    }
-
-    #exit-popup .menu-button {
-      font-family: 'Press Start 2P', sans-serif; /* Добавляем шрифт */
-      font-size: 16px;
-      padding: 10px 20px;
-      background-color: #86BB39;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      margin: 10px; /* Отступ между кнопками */
-    }
-
-    #exit-popup .menu-button:hover {
-      background-color: #75A730;
-    }
   </style>
 </head>
 <body>
@@ -248,10 +204,6 @@
         let stored = localStorage.getItem("snakeRecords");
         if (stored) {
           records = JSON.parse(stored);
-          if (records.length > 10) {
-            records = records.slice(0, 10);
-            localStorage.setItem("snakeRecords", JSON.stringify(records));
-          }
         } else {
           records = [];
         }
@@ -282,16 +234,16 @@
       html += "</ol>";
       recordDiv.html(html);
     }
-    // Увеличили лимит рекордов до 10
+    // Увеличили лимит рекордов с 10 до 15
     function qualifies(score) {
-      if (records.length < 10) return true;
+      if (records.length < 15) return true;
       return score > records[records.length - 1].score;
     }
     function addRecord(name, score) {
       records.push({ name, score });
       records.sort((a, b) => b.score - a.score);
-      // Если записей больше 10, удаляем лишние
-      if (records.length > 10) records.pop();
+      // Если записей больше 15, удаляем лишние
+      if (records.length > 15) records.pop();
       saveRecords();
       updateRecordsTable();
     }
@@ -411,13 +363,6 @@
         } else {
           // Заставка
           background("#1c1c1c");
-
-          // Рисуем рамку, как у игрового поля
-          stroke("#FFFFFF"); // Устанавливаем светлый цвет обводки
-          strokeWeight(2);
-          noFill();
-          rect(borderThickness, borderThickness, cols * gridSize, rows * gridSize);
-
           let s = 10;
           let artW = 8 * s;
           let artH = 8 * s;
@@ -557,16 +502,10 @@
         return;
       }
       if (keyCode === ESCAPE) {
-        if (gameStarted && !paused) {
-          if (controlMode === "ai") {
-            showExitPopup();
-          } else {
-            pauseGame();
-          }
-        } else if (paused) {
+        if (!paused) {
+          pauseGame();
+        } else {
           resumeGame();
-        } else if (!gameStarted) {
-          showExitPopup();
         }
         return;
       }
@@ -584,61 +523,25 @@
       }
     }
 
-    const { remote } = require('electron');
-
-    function showExitPopup() {
-      let exitPopupDiv = createDiv('');
-      exitPopupDiv.id('exit-popup');
-      exitPopupDiv.parent(document.body);
-
-      let message = createP('Вийти з гри?');
-      message.parent(exitPopupDiv);
-
-      let buttonContainer = createDiv('');
-      buttonContainer.parent(exitPopupDiv);
-      buttonContainer.style('display', 'flex');
-      buttonContainer.style('justify-content', 'center');
-      buttonContainer.style('gap', '20px'); // Увеличенный отступ между кнопками
-
-      let yesBtn = createButton('Так');
-      yesBtn.class("menu-button");
-      yesBtn.parent(buttonContainer);
-      yesBtn.mousePressed(() => {
-        remote.app.quit();
-      });
-
-      let noBtn = createButton('Ні');
-      noBtn.class("menu-button");
-      noBtn.parent(buttonContainer);
-      noBtn.mousePressed(() => {
-        exitPopupDiv.remove();
-        document.removeEventListener('keydown', handleKeyPress);
-      });
-
-      function handleKeyPress(event) {
-        if (event.key === 'Escape') {
-          exitPopupDiv.remove();
-          document.removeEventListener('keydown', handleKeyPress);
-        }
-      }
-
-      document.addEventListener('keydown', handleKeyPress);
-    }
-
     function pauseGame() {
       paused = true;
       createPauseMenu();
     }
-
     function resumeGame() {
       paused = false;
       removePauseMenu();
     }
-
     function createPauseMenu() {
       pauseMenuDiv = createDiv('');
       pauseMenuDiv.id('pause-menu');
       pauseMenuDiv.parent(document.body);
+
+      let resumeBtn = createButton('Продовжити');
+      resumeBtn.class("menu-button");
+      resumeBtn.parent(pauseMenuDiv);
+      resumeBtn.mousePressed(() => {
+        resumeGame();
+      });
 
       let exitBtn = createButton('Головне меню');
       exitBtn.class("menu-button");
@@ -651,7 +554,6 @@
         showStartMenu();
       });
     }
-
     function removePauseMenu() {
       if (pauseMenuDiv) {
         pauseMenuDiv.remove();
@@ -699,7 +601,7 @@
         bodyToCheck.shift();
       }
       for (let segment of bodyToCheck) {
-        if (segment.x === newHead.x && newHead.y === segment.y) return true;
+        if (segment.x === newHead.x && segment.y === newHead.y) return true;
       }
       return false;
     }

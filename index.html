@@ -168,6 +168,13 @@
   </style>
 </head>
 <body>
+  <!-- Проверка на мобильное устройство: если мобильное, выводим сообщение и останавливаем скрипт -->
+  <script>
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      document.body.innerHTML = '<h1 style="font-family: \'Press Start 2P\', sans-serif; text-align: center; margin-top: 50px;">Игра доступна только на десктопных устройствах</h1>';
+      throw new Error("Мобильные устройства не поддерживаются");
+    }
+  </script>
   <div id="wrapper">
     <div id="game-container"></div>
     <div id="menu"></div>
@@ -378,7 +385,7 @@
       canvas.parent('game-container');
       frameRate(10);
 
-      // Инициализируем осциллятор для звуков
+      // Инициализируем осциллятор для звуковых эффектов
       osc = new p5.Oscillator('square');
       osc.amp(0);
       osc.start();

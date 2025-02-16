@@ -222,9 +222,6 @@
     let gameOver = false;
     let canvas;
 
-    // Флаг, запрещающий более одной смены направления за кадр
-    let directionChanged = false;
-
     // Переменные для режима столкновения и мигания
     let collisionDetected = false;
     let collisionStartTime = 0;
@@ -442,9 +439,6 @@
     }
 
     function draw() {
-      // Сбрасываем флаг смены направления в начале кадра
-      directionChanged = false;
-
       if (!gameStarted) {
         if (gameOver) {
           if (controlMode === "ai") {
@@ -594,7 +588,6 @@
       showExitPopup();
     }
 
-    // Обработка нажатия клавиш – разрешаем смену направления не чаще одного раза за кадр
     function keyPressed() {
       if (inputDisplayed) return;
       
@@ -608,19 +601,14 @@
       }
       if (paused) return;
       if (controlMode === "user") {
-        if (directionChanged) return;
         if (keyCode === UP_ARROW && direction.dy !== 1) {
           direction = { dx: 0, dy: -1 };
-          directionChanged = true;
         } else if (keyCode === DOWN_ARROW && direction.dy !== -1) {
           direction = { dx: 0, dy: 1 };
-          directionChanged = true;
         } else if (keyCode === LEFT_ARROW && direction.dx !== 1) {
           direction = { dx: -1, dy: 0 };
-          directionChanged = true;
         } else if (keyCode === RIGHT_ARROW && direction.dx !== -1) {
           direction = { dx: 1, dy: 0 };
-          directionChanged = true;
         }
       }
     }
@@ -823,7 +811,7 @@
           inputDisplayed = false;
           resetGame();
         }
-      }, 5000);
+      }, 10000);
     }
 
     function resetGame() {

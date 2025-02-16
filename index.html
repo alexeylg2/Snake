@@ -399,6 +399,8 @@
       fill(200);
       text("Змійка загубилась!", width / 2, height / 2 + 40);
       updateRecordsTable();
+      // Изменение: после показа экрана Game Over, через 10 секунд возвращаем меню (и демо-режим)
+      setTimeout(showStartMenu, 10000);
     }
 
     function setup() {

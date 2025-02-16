@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><b>ЗМІЙКОКРАТ</b></title>
-  <!-- Проверка на мобильные устройства: если мобильное, заменяем содержимое документа -->
+  <!-- Проверка на неподходящие устройства: мобильные, планшеты и устройства с сенсорным управлением -->
   <script>
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
+    // Если юзер-агент указывает на мобильное устройство, планшет или устройство поддерживает сенсорное управление – блокируем игру
+    if (/Mobi|Android|Tablet|iPad/i.test(navigator.userAgent) || 'ontouchstart' in window || navigator.maxTouchPoints > 0) {
       document.documentElement.innerHTML = `
         <head>
           <meta charset="UTF-8">
@@ -30,7 +31,7 @@
         <body>
           <h1>Нам шкода, але ця змійка танцює лише на десктопі!</h1>
         </body>`;
-      throw new Error("Мобильные устройства не поддерживаются");
+      throw new Error("Непідтримуваний пристрій: гра працює лише на десктопах с фізичною клавіатурою");
     }
   </script>
   <!-- Подключаем p5.js -->

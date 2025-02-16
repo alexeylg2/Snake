@@ -803,14 +803,13 @@
         resetGame();
       });
       updateRecordsTable();
+      // Изменение: всегда запускаем демо режим через 10 секунд после появления меню
       autoStartTimeout = setTimeout(() => {
-        if (!gameStarted) {
           controlMode = "ai";
           gameStarted = true;
           scoreSubmitted = false;
           inputDisplayed = false;
           resetGame();
-        }
       }, 10000);
     }
 

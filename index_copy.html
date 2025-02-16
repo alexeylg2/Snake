@@ -20,49 +20,15 @@
               color: #fff;
               font-family: 'Press Start 2P', sans-serif;
               display: flex;
-              flex-direction: column;
               justify-content: center;
               align-items: center;
               height: 100vh;
               margin: 0;
             }
-            canvas {
-              image-rendering: pixelated;
-              image-rendering: crisp-edges;
-              margin-bottom: 20px;
-            }
           </style>
         </head>
         <body>
-          <canvas id="mobile-snake" width="80" height="80"></canvas>
           <h1>Нам шкода, але ця змійка танцює лише на десктопі!</h1>
-          <script>
-            (function(){
-              var canvas = document.getElementById("mobile-snake");
-              var ctx = canvas.getContext("2d");
-              var s = 10;
-              var snakeArt = [
-                [0, 1, 1, 1, 1, 1, 1, 0],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 3, 1, 1, 3, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1],
-                [0, 1, 1, 1, 1, 1, 1, 0],
-                [0, 0, 2, 2, 2, 2, 0, 0]
-              ];
-              for (var i = 0; i < snakeArt.length; i++) {
-                for (var j = 0; j < snakeArt[i].length; j++) {
-                  var cell = snakeArt[i][j];
-                  if (cell === 0) continue;
-                  if (cell === 1) ctx.fillStyle = "#86BB39";
-                  else if (cell === 2) ctx.fillStyle = "#D70000";
-                  else if (cell === 3) ctx.fillStyle = "#FFFFFF";
-                  ctx.fillRect(j * s, i * s, s, s);
-                }
-              }
-            })();
-          <\/script>
         </body>`;
       throw new Error("Мобильные устройства не поддерживаются");
     }
